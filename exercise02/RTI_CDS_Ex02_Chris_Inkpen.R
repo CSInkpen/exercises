@@ -13,7 +13,7 @@ library_list <- c("DBI", "RMySQL", "plyr", "data.table", "rms", "foreign", "ggpl
 # Install and Load pacman, a package-installing package in R that allows you to load
 # packages without output and check if a requested package is installed and install it if it is
 # present.
-# invisible(suppressMessages(install.packages('pacman')))
+invisible(suppressMessages(install.packages('pacman')))
 
 
 suppressMessages(library(pacman))
