@@ -8,7 +8,7 @@ graphics.off()
 
 library_list <- c("DBI", "RMySQL", "plyr", "data.table", "rms", "foreign", "ggplot2", "MASS", "reshape2", "pastecs", "Hmisc", "dummies", "Matching", 
                   "DataCombine", "stringr", "data.table", "stats", "plm", "ineq", "lubridate", "mallet", "XML", "rjson", "gridExtra", "rworldmap",
-                  "openNLP", "wordcloud", "qdap", "tm", "SnowballCC", "RColorBrewer", "biclust", "cluster", "igraph", "fpc")
+                  "openNLP", "wordcloud", "qdap", "tm", "SnowballCC", "RColorBrewer", "biclust", "cluster", "igraph", "fpc", "quanteda")
 
 # Install and Load pacman, a package-installing package in R that allows you to load
 # packages without output and check if a requested package is installed and install it if it is
@@ -351,6 +351,7 @@ fatal_data$WeatherCondition <- as.factor(fatal_data$WeatherCondition)
 avi_data$BroadPhaseOfFlight <- as.factor(avi_data$BroadPhaseOfFlight)
 table(avi_data$BroadPhaseOfFlight, useNA = "ifany")
 phase_pct_table <- 100*sort(table(avi_data$BroadPhaseOfFlight, useNA = "ifany"), decreasing = TRUE)/nrow(avi_data)
+phase_pct_table
 sum(phase_pct_table[1:2])
 # Here, we can see that 43% of accidents/incidents occurred during takeoff or landing (moreso
 # landing than takeoff). 14% occurred in Cruise, 12% while maneuvering, 10% during approach.
@@ -452,8 +453,12 @@ hist_deaths + geom_bar() + ggtitle("Aviation Fatalities") + ylab("Count") + xlab
 
 fatality_pct_table <- 100*sort(table(avi_data$fatality_cat, useNA = "ifany"), decreasing = TRUE)/nrow(avi_data)
 fatality_pct_table
+graph_name_2 <- "fatality_cat.png"
+png(file = graph_name_2)
 plot(fatality_pct_table, type="b", main="Aviation Fatalities as Percent of Total Incidents", xlab="Aviation Fatalities", ylab = "Percentage of Overall Incidents", xaxt = "n")
 axis(1,1:6, labels=names(fatality_pct_table[1:6]))
+dev.off()
+
 
 ##############################################################
 #### Part 2 - Bringing in JSON Data for Narative Analysis ####
@@ -588,12 +593,6 @@ merged_data <- cbind(merged_data, Probable_Cause_stopwords_df)
 
 length(unique(merged_data$Narrative_Text_clean))
 
-# i'm bringing this package in later because it masks some functions I need 
-install.packages("quanteda")
-library(quanteda)
-
-
-
 narrative_text_corpus <- corpus(merged_data$Narrative_Text_clean)
 class(narrative_text_corpus)
 
@@ -616,7 +615,7 @@ p <- p + geom_bar(stat="identity")
 p <- p + theme(axis.text.x=element_text(angle=45, hjust=1)) 
 p <- p + ggtitle("Frequency of Words in Narrative Text (top 10) as Percentage")
 p 
-
+ggsave("NT_top_ten_words.png")
 
 ### Probable Cause Frequent Terms ###
 
@@ -644,7 +643,7 @@ p <- p + geom_bar(stat="identity")
 p <- p + theme(axis.text.x=element_text(angle=45, hjust=1)) 
 p <- p + ggtitle("Frequency of Words in Probable Cause (top 10) as Percentage")
 p 
-
+ggsave("PC_top_ten_words.png")
 
 # Here we can see that the "Pilot's" (apostrophe removed) word is the most common
 # with failure following. Landing is also frequent, as is loss and control. The most 
@@ -746,7 +745,7 @@ probable_cause_topword_by_year.t
 # which has a solid background in text analysis (originally as a Java tool), and is 
 # frequently used in the humanities to analyze large corpuses.
 
-library(mallet)
+
 
 setwd("/Users/christopherinkpen/PSU_Class_Documents/PSU_Class_Documents/Job_Market_Materials/RTI/exercises/exercise02")
 
@@ -927,8 +926,8 @@ names(doc.topics.m.pc.df) <- c("PC_topic 1", "PC_topic 2", "PC_topic 3", "PC_top
 # Finally, I can append the proportions to the original dataframe for future analysis.
 doc.topics.df <- cbind(doc.topics.df, doc.topics.m.pc.df)
 
-
-
+gc(rm(list=ls()))
+graphics.off()
 
 
 
